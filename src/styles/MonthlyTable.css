@@ -44,3 +44,8 @@
   padding: 4px;
   box-sizing: border-box;
 }
+
+.highlight {
+  background-color: yellow !important;
+}
+

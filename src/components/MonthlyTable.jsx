@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
 import '../styles/MonthlyTable.css';
 
-const persons = ['Bence', 'Dávid', 'Gábor', 'Gyöngyi']
+const persons = ['Bence', 'Dávid', 'Gábor', 'Gyöngyi'];
 
 const MonthlyTable = () => {
-  const today = new Date()
+  const today = new Date();
 
-  const [year, setYear] = useState(today.getFullYear())
-  const [month, setMonth] = useState(today.getMonth())
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
 
-  const [personSelections, setPersonSelections] = useState({})
-  const [messages, setMessages] = useState({})
+  const [personSelections, setPersonSelections] = useState({});
+  const [messages, setMessages] = useState({});
+  const [highlightName, setHighlightName] = useState(''); // New: name to highlight
 
-  const weeks = getWeeksInMonth(year, month)
+  const weeks = getWeeksInMonth(year, month);
 
   const handlePersonChange = (key, value) => {
-    setPersonSelections((prev) => ({ ...prev, [key]: value }))
-  }
+    setPersonSelections((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleMessageChange = (key, value) => {
-    setMessages((prev) => ({ ...prev, [key]: value }))
-  }
+    setMessages((prev) => ({ ...prev, [key]: value }));
+  };
 
   return (
     <div className="table-container">
@@ -43,6 +44,18 @@ const MonthlyTable = () => {
             </option>
           ))}
         </select>
+
+        {/* Highlight filter */}
+        <select
+          value={highlightName}
+          onChange={(e) => setHighlightName(e.target.value)}
+          style={{ marginLeft: '20px' }}
+        >
+          <option value="">Highlight Name...</option>
+          {persons.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
       </div>
 
       {weeks.map((week, weekIndex) => (
@@ -52,9 +65,9 @@ const MonthlyTable = () => {
               <tr>
                 <th>Week {weekIndex + 1}</th>
                 {week.flatMap((date, i) => {
-                  if (!date) return [<th key={`empty-${i}`}></th>]
+                  if (!date) return [<th key={`empty-${i}`}></th>];
 
-                  const isWeekend = date.getDay() === 0 || date.getDay() === 6
+                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
                   if (isWeekend) {
                     return [
@@ -68,11 +81,15 @@ const MonthlyTable = () => {
                         <br />
                         {date.getDate()}
                       </th>,
-                    ]
+                    ];
                   } else {
                     return [
-                      <th key={i}>{date.toLocaleDateString('en-US', { weekday: 'short' })}<br />{date.getDate()}</th>,
-                    ]
+                      <th key={i}>
+                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                        <br />
+                        {date.getDate()}
+                      </th>,
+                    ];
                   }
                 })}
               </tr>
@@ -83,15 +100,15 @@ const MonthlyTable = () => {
               <tr>
                 <td><strong>Time</strong></td>
                 {week.flatMap((date, i) => {
-                  if (!date) return [<td key={`empty-${i}`}></td>]
-                  const isWeekend = date.getDay() === 0 || date.getDay() === 6
+                  if (!date) return [<td key={`empty-${i}`}></td>];
+                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
                   if (isWeekend) {
                     return [
                       <td key={`morning-time-${i}`}>08–15</td>,
                       <td key={`evening-time-${i}`}>15–22</td>,
-                    ]
+                    ];
                   } else {
-                    return [<td key={`weekday-time-${i}`}>18–22</td>]
+                    return [<td key={`weekday-time-${i}`}>18–22</td>];
                   }
                 })}
               </tr>
@@ -100,17 +117,23 @@ const MonthlyTable = () => {
               <tr>
                 <td><strong>Name</strong></td>
                 {week.flatMap((date, i) => {
-                  if (!date) return [<td key={`empty-${i}`}></td>]
+                  if (!date) return [<td key={`empty-${i}`}></td>];
 
-                  const isWeekend = date.getDay() === 0 || date.getDay() === 6
+                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+
+                  const morningKey = `${date.toISOString()}-morning`;
+                  const eveningKey = `${date.toISOString()}-evening`;
+                  const fullKey = `${date.toISOString()}-full`;
+
                   if (isWeekend) {
                     return [
-                      <td key={`morning-${i}`}>
+                      <td
+                        key={`morning-${i}`}
+                        className={personSelections[morningKey] === highlightName ? 'highlight' : ''}
+                      >
                         <select
-                          value={personSelections[`${date.toISOString()}-morning`] || ''}
-                          onChange={(e) =>
-                            handlePersonChange(`${date.toISOString()}-morning`, e.target.value)
-                          }
+                          value={personSelections[morningKey] || ''}
+                          onChange={(e) => handlePersonChange(morningKey, e.target.value)}
                         >
                           <option value="">—</option>
                           {persons.map((p) => (
@@ -118,12 +141,13 @@ const MonthlyTable = () => {
                           ))}
                         </select>
                       </td>,
-                      <td key={`evening-${i}`}>
+                      <td
+                        key={`evening-${i}`}
+                        className={personSelections[eveningKey] === highlightName ? 'highlight' : ''}
+                      >
                         <select
-                          value={personSelections[`${date.toISOString()}-evening`] || ''}
-                          onChange={(e) =>
-                            handlePersonChange(`${date.toISOString()}-evening`, e.target.value)
-                          }
+                          value={personSelections[eveningKey] || ''}
+                          onChange={(e) => handlePersonChange(eveningKey, e.target.value)}
                         >
                           <option value="">—</option>
                           {persons.map((p) => (
@@ -131,15 +155,16 @@ const MonthlyTable = () => {
                           ))}
                         </select>
                       </td>,
-                    ]
+                    ];
                   } else {
                     return [
-                      <td key={`weekday-${i}`}>
+                      <td
+                        key={`weekday-${i}`}
+                        className={personSelections[fullKey] === highlightName ? 'highlight' : ''}
+                      >
                         <select
-                          value={personSelections[`${date.toISOString()}-full`] || ''}
-                          onChange={(e) =>
-                            handlePersonChange(`${date.toISOString()}-full`, e.target.value)
-                          }
+                          value={personSelections[fullKey] || ''}
+                          onChange={(e) => handlePersonChange(fullKey, e.target.value)}
                         >
                           <option value="">—</option>
                           {persons.map((p) => (
@@ -147,7 +172,7 @@ const MonthlyTable = () => {
                           ))}
                         </select>
                       </td>,
-                    ]
+                    ];
                   }
                 })}
               </tr>
@@ -156,45 +181,43 @@ const MonthlyTable = () => {
               <tr>
                 <td><strong>Message</strong></td>
                 {week.flatMap((date, i) => {
-                  if (!date) return [<td key={`empty-${i}`}></td>]
+                  if (!date) return [<td key={`empty-${i}`}></td>];
 
-                  const isWeekend = date.getDay() === 0 || date.getDay() === 6
+                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                  const morningKey = `${date.toISOString()}-morning`;
+                  const eveningKey = `${date.toISOString()}-evening`;
+                  const fullKey = `${date.toISOString()}-full`;
+
                   if (isWeekend) {
                     return [
                       <td key={`morning-msg-${i}`}>
                         <input
                           type="text"
-                          value={messages[`${date.toISOString()}-morning`] || ''}
-                          onChange={(e) =>
-                            handleMessageChange(`${date.toISOString()}-morning`, e.target.value)
-                          }
+                          value={messages[morningKey] || ''}
+                          onChange={(e) => handleMessageChange(morningKey, e.target.value)}
                           placeholder="Comment"
                         />
                       </td>,
                       <td key={`evening-msg-${i}`}>
                         <input
                           type="text"
-                          value={messages[`${date.toISOString()}-evening`] || ''}
-                          onChange={(e) =>
-                            handleMessageChange(`${date.toISOString()}-evening`, e.target.value)
-                          }
+                          value={messages[eveningKey] || ''}
+                          onChange={(e) => handleMessageChange(eveningKey, e.target.value)}
                           placeholder="Comment"
                         />
                       </td>,
-                    ]
+                    ];
                   } else {
                     return [
                       <td key={`weekday-msg-${i}`}>
                         <input
                           type="text"
-                          value={messages[`${date.toISOString()}-full`] || ''}
-                          onChange={(e) =>
-                            handleMessageChange(`${date.toISOString()}-full`, e.target.value)
-                          }
+                          value={messages[fullKey] || ''}
+                          onChange={(e) => handleMessageChange(fullKey, e.target.value)}
                           placeholder="Comment"
                         />
                       </td>,
-                    ]
+                    ];
                   }
                 })}
               </tr>
@@ -203,43 +226,43 @@ const MonthlyTable = () => {
         </div>
       ))}
     </div>
-  )
+  );
 
   // ------------------- Helpers -------------------
   function getWeeksInMonth(year, month) {
-    const weeks = []
-    let currentWeek = []
+    const weeks = [];
+    let currentWeek = [];
 
-    const date = new Date(year, month, 1)
-    const firstDay = date.getDay() === 0 ? 7 : date.getDay() // treat Sunday as 7
+    const date = new Date(year, month, 1);
+    const firstDay = date.getDay() === 0 ? 7 : date.getDay(); // Monday as first day
 
-    for (let i = 1; i < firstDay; i++) currentWeek.push(null)
+    for (let i = 1; i < firstDay; i++) currentWeek.push(null);
 
     while (date.getMonth() === month) {
-      currentWeek.push(new Date(date))
+      currentWeek.push(new Date(date));
 
       if (date.getDay() === 0) {
-        weeks.push(currentWeek)
-        currentWeek = []
+        weeks.push(currentWeek);
+        currentWeek = [];
       }
 
-      date.setDate(date.getDate() + 1)
+      date.setDate(date.getDate() + 1);
     }
 
-    if (currentWeek.length) weeks.push(currentWeek)
+    if (currentWeek.length) weeks.push(currentWeek);
 
     weeks.forEach((week) => {
-      while (week.length < 7) week.push(null)
-    })
+      while (week.length < 7) week.push(null);
+    });
 
-    return weeks
+    return weeks;
   }
 
   function getYearRange(start, end) {
-    const years = []
-    for (let y = start; y <= end; y++) years.push(y)
-    return years
+    const years = [];
+    for (let y = start; y <= end; y++) years.push(y);
+    return years;
   }
-}
+};
 
-export default MonthlyTable
+export default MonthlyTable;
