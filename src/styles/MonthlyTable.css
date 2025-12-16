@@ -1,0 +1,46 @@
+.table-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column; /* stack tables vertically */
+  align-items: center; /* center tables horizontally */
+}
+
+.controls {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.week-wrapper {
+  margin-bottom: 20px;
+  width: 100%;
+  overflow-x: auto; /* horizontal scroll if table is wide */
+}
+
+.monthly-table {
+  border-collapse: collapse;
+  text-align: center;
+  width: auto; /* table width based on content */
+  min-width: 600px; /* ensure table doesn’t shrink too much */
+}
+
+.monthly-table th,
+.monthly-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+.monthly-table th.weekend {
+  background-color: rgba(216, 216, 216, 0.964); /* light blue background for weekends */
+  color: #dc2626; /* red text for weekends */
+}
+
+.monthly-table td.weekend {
+  background-color: #615f5fff; /* dark shade for weekend cells */
+}
+
+.monthly-table td input,
+.monthly-table td select {
+  width: 90%;
+  padding: 4px;
+  box-sizing: border-box;
+}
